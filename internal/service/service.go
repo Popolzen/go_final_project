@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/Popolzen/go_final_project/internal/models"
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 )
 
@@ -28,4 +29,5 @@ type SecretService interface {
 type Claims struct {
 	UserID   string `json:"user_id"`
 	Username string `json:"username"`
+	jwt.RegisteredClaims
 }

@@ -2,9 +2,11 @@ package service
 
 import (
 	"context"
+	"time"
 
 	"github.com/Popolzen/go_final_project/internal/models"
 	"github.com/Popolzen/go_final_project/internal/storage"
+	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -13,14 +15,14 @@ type authService struct {
 	jwtSecret string
 }
 
-// func NewAuthService(repo storage.Repository, jwtSecret string) AuthService {
-// 	return authService{
-// 		repo:      repo,
-// 		jwtSecret: string,
-// 	}
-// }
+func NewAuthService(repo storage.Repository, jwtSecret string) AuthService {
+	return authService{
+		repo:      repo,
+		jwtSecret: jwtSecret,
+	}
+}
 
-func (s *authService) Login(ctx context.Context, username, password string) (string, error) {
+func (s authService) Login(ctx context.Context, username, password string) (string, error) {
 	user, err := s.repo.GetUserByUsername(ctx, username)
 	if err != nil || user == nil {
 		return "", models.ErrInvalidCredentials
@@ -33,11 +35,10 @@ func (s *authService) Login(ctx context.Context, username, password string) (str
 		return "", models.ErrInvalidCredentials
 	}
 
-	// TODO: generate token
-	return "", nil
+	return s.generateToken(user)
 }
 
-func (s *authService) Register(ctx context.Context, username, password string) (string, error) {
+func (s authService) Register(ctx context.Context, username, password string) (string, error) {
 
 	if len(username) < 3 {
 		return "", models.ErrInvalidUsername
@@ -59,6 +60,18 @@ func (s *authService) Register(ctx context.Context, username, password string) (
 		return "", err
 	}
 
-	// TODO: generate token
-	return "", nil
+	return s.generateToken(user)
+}
+
+func (s *authService) generateToken(user *models.User) (string, error) {
+	claims := Claims{
+		UserID:   user.ID.String(),
+		Username: user.Username,
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Hour)),
+		},
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	return token.SignedString(s.jwtSecret)
 }
