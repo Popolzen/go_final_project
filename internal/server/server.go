@@ -18,6 +18,7 @@ func (h *Handler) Routes() http.Handler {
 
 	r.Post("/api/v1/auth/register", h.Register)
 	r.Post("/api/v1/auth/login", h.Login)
+	r.Post("/api/v1/secrets", h.CreateSecret)
 
 	return r
 }

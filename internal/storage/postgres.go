@@ -109,8 +109,14 @@ func (r *PostgresRepository) CreateSecret(ctx context.Context, secret *models.Se
 		Scan(&secret.ID, &secret.Version, &secret.CreatedAt, &secret.UpdatedAt)
 
 	if err != nil {
+		var pqErr *pq.Error
+		if errors.As(err, &pqErr) && pqErr.Code == "23505" {
+			return models.ErrSecretAlreadyExists
+		}
+
 		return fmt.Errorf("failed to create secret: %w", err)
 	}
+
 	return nil
 }
 
