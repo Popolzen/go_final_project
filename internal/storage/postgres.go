@@ -163,7 +163,7 @@ func (r *PostgresRepository) DeleteSecret(ctx context.Context, id, userID uuid.U
 func (r *PostgresRepository) GetSecret(ctx context.Context, id, userID uuid.UUID) (*models.Secret, error) {
 	var secret models.Secret
 
-	query := `SELECT * FROM users WHERE id = $1 AND user_id = $2 AND deleted_at IS NULL`
+	query := `SELECT * FROM secrets WHERE id = $1 AND user_id = $2 AND deleted_at IS NULL`
 
 	err := r.db.GetContext(ctx, &secret, query, id, userID)
 	if errors.Is(err, sql.ErrNoRows) {
@@ -179,7 +179,7 @@ func (r *PostgresRepository) GetSecret(ctx context.Context, id, userID uuid.UUID
 func (r *PostgresRepository) GetSecretByName(ctx context.Context, name string, secretType models.SecretType, userID uuid.UUID) (*models.Secret, error) {
 	var secret models.Secret
 
-	query := `SELECT * FROM users WHERE name = $1 AND type = $2 AND user_id = $3 AND deleted_at IS NULL`
+	query := `SELECT * FROM secrets WHERE name = $1 AND type = $2 AND user_id = $3 AND deleted_at IS NULL`
 
 	err := r.db.GetContext(ctx, &secret, query, name, secretType, userID)
 	if errors.Is(err, sql.ErrNoRows) {

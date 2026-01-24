@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/Popolzen/go_final_project/internal/server"
+	"github.com/Popolzen/go_final_project/internal/service"
 	"github.com/Popolzen/go_final_project/internal/storage"
 )
 
@@ -21,7 +22,9 @@ func main() {
 
 	jwtSecret := []byte("my-secret-key")
 	encKey := make([]byte, 32)
-	handler := server.NewHandler(repo, jwtSecret, encKey)
+	secretService := service.NewSecretService(repo, encKey)
+	authService := service.NewAuthService(repo, jwtSecret)
+	handler := server.NewHandler(authService, secretService)
 
 	addr := ":8080"
 	log.Printf("Сервер запущен на http://localhost%s", addr)

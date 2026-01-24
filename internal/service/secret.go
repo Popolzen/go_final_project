@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"errors"
 	"io"
+	"time"
 
 	"github.com/Popolzen/go_final_project/internal/models"
 	"github.com/Popolzen/go_final_project/internal/storage"
@@ -19,12 +20,12 @@ type secretService struct {
 	encKey []byte
 }
 
-//	func NewSecretService(repo storage.Repository, encKey []byte) SecretService {
-//		return &secretService{
-//			repo:   repo,
-//			encKey: encKey,
-//		}
-//	}
+func NewSecretService(repo storage.Repository, encKey []byte) SecretService {
+	return &secretService{
+		repo:   repo,
+		encKey: encKey,
+	}
+}
 
 func (s secretService) CreateSecret(ctx context.Context,
 	userID uuid.UUID,
@@ -82,13 +83,65 @@ func (s secretService) GetSecret(ctx context.Context, secretID, userID uuid.UUID
 		return nil, nil, err
 	}
 
-	var data interface{}
+	var data any
 	if err := json.Unmarshal(raw, &data); err != nil {
 		return nil, nil, err
 	}
 
 	return secret, data, nil
 
+}
+
+func (s secretService) GetSecretByName(ctx context.Context,
+	name string, secretType models.SecretType, userID uuid.UUID) (*models.Secret, interface{}, error) {
+
+	secret, err := s.repo.GetSecretByName(ctx, name, secretType, userID)
+	if err != nil {
+		return nil, nil, err
+	}
+	raw, err := s.decrypt(secret.Data)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	var data any
+	if err := json.Unmarshal(raw, &data); err != nil {
+		return nil, nil, err
+	}
+
+	return secret, data, nil
+}
+
+func (s secretService) ListSecrets(ctx context.Context, userID uuid.UUID) ([]*models.Secret, error) {
+	return s.repo.ListSecrets(ctx, userID)
+}
+
+func (s *secretService) UpdateSecret(ctx context.Context, secretID, userID uuid.UUID, data interface{}, metadata string) error {
+	raw, err := json.Marshal(data)
+	if err != nil {
+		return err
+	}
+
+	encrypted, err := s.encrypt(raw)
+	if err != nil {
+		return err
+	}
+	secret := &models.Secret{
+		ID:       secretID,
+		UserID:   userID,
+		Data:     encrypted,
+		Metadata: metadata,
+	}
+
+	return s.repo.UpdateSecret(ctx, secret)
+}
+
+func (s *secretService) DeleteSecret(ctx context.Context, secretID, userID uuid.UUID) error {
+	return s.repo.DeleteSecret(ctx, secretID, userID)
+}
+
+func (s *secretService) GetSecretsAfter(ctx context.Context, userID uuid.UUID, after time.Time) ([]*models.Secret, error) {
+	return s.repo.GetSecretsAfter(ctx, userID, after)
 }
 
 func (s secretService) encrypt(data []byte) ([]byte, error) {

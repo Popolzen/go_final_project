@@ -3,11 +3,9 @@ package server
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"net/http"
 
 	"github.com/Popolzen/go_final_project/internal/models"
-	"golang.org/x/crypto/bcrypt"
 )
 
 type RegisterRequest struct {
@@ -33,37 +31,25 @@ func (h *Handler) Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if len(req.Username) < 3 {
-		respondError(w, http.StatusBadRequest, "username must be at least 3 characters")
-		return
-	}
-	if len(req.Password) < 8 {
-		respondError(w, http.StatusBadRequest, "password must be at least 8 characters")
-		return
-	}
-
-	hash, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
+	token, err := h.authService.Register(r.Context(), req.Username, req.Password)
 	if err != nil {
-		respondError(w, http.StatusBadRequest, "failed to hash password")
-		return
-	}
-	user := &models.User{Username: req.Username, PasswordHash: string(hash)}
-
-	if err = h.repo.CreateUser(r.Context(), user); err != nil {
-		if errors.Is(err, models.ErrUserExists) {
+		switch {
+		case errors.Is(err, models.ErrInvalidUsername):
+			respondError(w, http.StatusBadRequest, "username must be at least 3 characters")
+		case errors.Is(err, models.ErrInvalidPassword):
+			respondError(w, http.StatusBadRequest, "password must be at least 8 characters")
+		case errors.Is(err, models.ErrUserExists):
 			respondError(w, http.StatusConflict, "username already exists")
-			return
+		default:
+			respondError(w, http.StatusInternalServerError, "failed to create user")
 		}
-		respondError(w, http.StatusInternalServerError, "failed to create user")
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(AuthResponse{Token: "QWeqweqweqweqwe"})
+	respondJSON(w, http.StatusCreated, AuthResponse{Token: token})
 }
 
-//
-
+// Login аутентифицирует пользователя
 func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
 	var req LoginRequest
 
@@ -72,19 +58,15 @@ func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, err := h.repo.GetUserByUsername(r.Context(), req.Username)
-	if err != nil || user == nil {
-		respondError(w, http.StatusBadRequest, "invalid credentials")
+	token, err := h.authService.Login(r.Context(), req.Username, req.Password)
+	if err != nil {
+		if errors.Is(err, models.ErrInvalidCredentials) {
+			respondError(w, http.StatusUnauthorized, "invalid credentials")
+			return
+		}
+		respondError(w, http.StatusInternalServerError, "login failed")
 		return
 	}
 
-	if err := bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(req.Password)); err != nil {
-		respondError(w, http.StatusUnauthorized, "invalid credentials")
-		return
-	}
-
-	fmt.Printf("success")
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(AuthResponse{Token: "QWeqweqweqweqwe"})
-
+	respondJSON(w, http.StatusOK, AuthResponse{Token: token})
 }

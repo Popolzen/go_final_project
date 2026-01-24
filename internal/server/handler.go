@@ -4,22 +4,20 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/Popolzen/go_final_project/internal/storage"
+	"github.com/Popolzen/go_final_project/internal/service"
 )
 
 // Handler содержит зависимости для всех handlers
 type Handler struct {
-	repo      storage.Repository
-	jwtSecret []byte
-	encKey    []byte
+	authService   service.AuthService
+	secretService service.SecretService
 }
 
-// NewHandler создаёт новый Handler
-func NewHandler(repo storage.Repository, jwtSecret, encKey []byte) *Handler {
+// NewHandler создаёт новый Handler с сервисами
+func NewHandler(authService service.AuthService, secretService service.SecretService) *Handler {
 	return &Handler{
-		repo:      repo,
-		jwtSecret: jwtSecret,
-		encKey:    encKey,
+		authService:   authService,
+		secretService: secretService,
 	}
 }
 
