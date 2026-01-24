@@ -13,4 +13,5 @@ var (
 	ErrUnauthorized       = errors.New("unauthorized access")
 	ErrInvalidPassword    = errors.New("password must be at least 8 characters")
 	ErrInvalidCredentials = errors.New("invalid credentials")
+	ErrInvalidSecretData  = errors.New("invalid secret data")
 )
