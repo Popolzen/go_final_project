@@ -16,19 +16,22 @@ func (h *Handler) Routes() http.Handler {
 	r.Use(middleware.RequestID)
 	r.Use(middleware.RealIP)
 
-	r.Post("/api/v1/auth/register", h.Register)
-	r.Post("/api/v1/auth/login", h.Login)
+	r.Route("/api/v1", func(r chi.Router) {
+		r.Post("/auth/register", h.Register)
+		r.Post("/auth/login", h.Login)
 
-	r.Post("/api/v1/secrets", h.CreateSecret)
-	r.Get("/api/v1/secrets", h.ListSecrets)
+		r.Route("/secrets", func(r chi.Router) {
+			r.Use(h.AuthMiddleware)
 
-	r.Get("/api/v1/secrets/{id}", h.GetSecret)
-	r.Put("/api/v1/secrets/{id}", h.UpdateSecret)
-	r.Delete("/api/v1/secrets/{id}", h.DeleteSecret)
-
-	r.Get("/api/v1/secrets/by-name/{name}", h.GetSecretByName)
-
-	r.Get("/api/v1/secrets/changes", h.GetSecretsAfter)
+			r.Post("/", h.CreateSecret)
+			r.Get("/", h.ListSecrets)
+			r.Get("/{id}", h.GetSecret)
+			r.Put("/{id}", h.UpdateSecret)
+			r.Delete("/{id}", h.DeleteSecret)
+			r.Get("/by-name/{name}", h.GetSecretByName)
+			r.Get("/changes", h.GetSecretsAfter)
+		})
+	})
 
 	return r
 }
