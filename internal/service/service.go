@@ -12,7 +12,7 @@ import (
 type AuthService interface {
 	Register(ctx context.Context, username, password string) (string, error)
 	Login(ctx context.Context, username, password string) (string, error)
-	// ValidateToken(tokenString string) (*Claims, error)
+	ValidateToken(tokenString string) (*Claims, error)
 }
 
 type SecretService interface {

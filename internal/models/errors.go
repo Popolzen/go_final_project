@@ -15,4 +15,5 @@ var (
 	ErrInvalidCredentials  = errors.New("invalid credentials")
 	ErrInvalidSecretData   = errors.New("invalid secret data")
 	ErrSecretAlreadyExists = errors.New("secret already exists")
+	ErrInvalidToken        = errors.New("invalid token")
 )

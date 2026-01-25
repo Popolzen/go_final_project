@@ -75,3 +75,26 @@ func (s *authService) generateToken(user *models.User) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	return token.SignedString(s.jwtSecret)
 }
+
+func (s authService) ValidateToken(tokenString string) (*Claims, error) {
+	token, err := jwt.ParseWithClaims(
+		tokenString,
+		&Claims{},
+		func(token *jwt.Token) (any, error) {
+			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+				return nil, models.ErrInvalidToken
+			}
+			return s.jwtSecret, nil
+		},
+	)
+	if err != nil {
+		return nil, models.ErrInvalidToken
+	}
+
+	claims, ok := token.Claims.(*Claims)
+	if !ok || !token.Valid {
+		return nil, models.ErrInvalidToken
+	}
+
+	return claims, nil
+}
