@@ -16,11 +16,11 @@ type AuthService interface {
 }
 
 type SecretService interface {
-	CreateSecret(ctx context.Context, userID uuid.UUID, secretType models.SecretType, name string, data interface{}, metadata string) (*models.Secret, error)
-	GetSecret(ctx context.Context, secretID, userID uuid.UUID) (*models.Secret, interface{}, error)
-	GetSecretByName(ctx context.Context, name string, secretType models.SecretType, userID uuid.UUID) (*models.Secret, interface{}, error)
+	CreateSecret(ctx context.Context, userID uuid.UUID, secretType models.SecretType, name string, data []byte, metadata string) (*models.Secret, error)
+	GetSecret(ctx context.Context, secretID, userID uuid.UUID) (*models.Secret, error)
+	GetSecretByName(ctx context.Context, name string, secretType models.SecretType, userID uuid.UUID) (*models.Secret, error)
 	ListSecrets(ctx context.Context, userID uuid.UUID) ([]*models.Secret, error)
-	UpdateSecret(ctx context.Context, secretID, userID uuid.UUID, data interface{}, metadata string) error
+	UpdateSecret(ctx context.Context, secretID, userID uuid.UUID, data []byte, metadata string) error
 	DeleteSecret(ctx context.Context, secretID, userID uuid.UUID) error
 	GetSecretsAfter(ctx context.Context, userID uuid.UUID, after time.Time) ([]*models.Secret, error)
 }

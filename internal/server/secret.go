@@ -71,25 +71,12 @@ func (h *Handler) CreateSecret(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data, err := parseSecretData(req.Type, req.Data)
-	if err != nil {
-		switch {
-		case errors.Is(err, models.ErrInvalidSecretType):
-			respondError(w, http.StatusBadRequest, "invalid secret type")
-		case errors.Is(err, models.ErrInvalidSecretData):
-			respondError(w, http.StatusBadRequest, "invalid secret data")
-		default:
-			respondError(w, http.StatusBadRequest, "invalid request")
-		}
-		return
-	}
-
 	secret, err := h.secretService.CreateSecret(
 		r.Context(),
 		userUUID,
 		req.Type,
 		req.Name,
-		data,
+		req.Data,
 		req.Metadata,
 	)
 	if err != nil {
@@ -118,7 +105,7 @@ func (h *Handler) GetSecret(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	userUUID, err := userIDFromContext(r.Context())
-	secret, data, err := h.secretService.GetSecret(r.Context(), secretID, userUUID)
+	secret, err := h.secretService.GetSecret(r.Context(), secretID, userUUID)
 	if err != nil {
 		handleSecretServiceError(w, err)
 		return
@@ -128,7 +115,7 @@ func (h *Handler) GetSecret(w http.ResponseWriter, r *http.Request) {
 		ID:        secret.ID.String(),
 		Type:      secret.Type,
 		Name:      secret.Name,
-		Data:      data,
+		Data:      secret.Data,
 		Metadata:  secret.Metadata,
 		Version:   secret.Version,
 		CreatedAt: secret.CreatedAt.Format(time.RFC3339),
@@ -154,7 +141,7 @@ func (h *Handler) GetSecretByName(w http.ResponseWriter, r *http.Request) {
 		respondError(w, http.StatusUnauthorized, "invalid user")
 		return
 	}
-	secret, data, err := h.secretService.GetSecretByName(r.Context(), name, secretType, userUUID)
+	secret, err := h.secretService.GetSecretByName(r.Context(), name, secretType, userUUID)
 
 	if err != nil {
 		handleSecretServiceError(w, err)
@@ -164,7 +151,7 @@ func (h *Handler) GetSecretByName(w http.ResponseWriter, r *http.Request) {
 		ID:        secret.ID.String(),
 		Type:      secret.Type,
 		Name:      secret.Name,
-		Data:      data,
+		Data:      secret.Data,
 		Metadata:  secret.Metadata,
 		Version:   secret.Version,
 		CreatedAt: secret.CreatedAt.Format(time.RFC3339),
@@ -308,46 +295,6 @@ func (h *Handler) GetSecretsAfter(w http.ResponseWriter, r *http.Request) {
 	}
 
 	respondJSON(w, http.StatusOK, resp)
-}
-
-func parseSecretData(
-	secretType models.SecretType,
-	raw json.RawMessage,
-) (any, error) {
-
-	switch secretType {
-
-	case models.SecretTypeLogin:
-		var d models.LoginData
-		if err := json.Unmarshal(raw, &d); err != nil {
-			return nil, models.ErrInvalidSecretData
-		}
-		return d, nil
-
-	case models.SecretTypeText:
-		var d models.TextData
-		if err := json.Unmarshal(raw, &d); err != nil {
-			return nil, models.ErrInvalidSecretData
-		}
-		return d, nil
-
-	case models.SecretTypeBinary:
-		var d models.BinaryData
-		if err := json.Unmarshal(raw, &d); err != nil {
-			return nil, models.ErrInvalidSecretData
-		}
-		return d, nil
-
-	case models.SecretTypeCard:
-		var d models.CardData
-		if err := json.Unmarshal(raw, &d); err != nil {
-			return nil, models.ErrInvalidSecretData
-		}
-		return d, nil
-
-	default:
-		return nil, models.ErrInvalidSecretType
-	}
 }
 
 func handleSecretServiceError(w http.ResponseWriter, err error) {
