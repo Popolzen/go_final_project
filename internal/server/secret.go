@@ -15,7 +15,7 @@ import (
 type CreateSecretRequest struct {
 	Type     models.SecretType `json:"type"`
 	Name     string            `json:"name"`
-	Data     json.RawMessage   `json:"data"`
+	Data     []byte            `json:"data"`
 	Metadata string            `json:"metadata,omitempty"`
 }
 
@@ -33,7 +33,7 @@ type GetSecretResponse struct {
 	ID        string            `json:"id"`
 	Type      models.SecretType `json:"type"`
 	Name      string            `json:"name"`
-	Data      any               `json:"data"`
+	Data      []byte            `json:"data"`
 	Metadata  string            `json:"metadata,omitempty"`
 	Version   int               `json:"version"`
 	CreatedAt string            `json:"created_at"`
@@ -41,8 +41,8 @@ type GetSecretResponse struct {
 }
 
 type UpdateSecretRequest struct {
-	Data     json.RawMessage `json:"data"`
-	Metadata string          `json:"metadata,omitempty"`
+	Data     []byte `json:"data"`
+	Metadata string `json:"metadata,omitempty"`
 }
 
 type SecretSyncResponse struct {

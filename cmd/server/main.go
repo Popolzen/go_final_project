@@ -34,10 +34,7 @@ func main() {
 		[]byte(cfg.JWTSecret),
 	)
 
-	secretService := service.NewSecretService(
-		repo,
-		[]byte(cfg.EncryptKey),
-	)
+	secretService := service.NewSecretService(repo)
 
 	handler := server.NewHandler(authService, secretService)
 

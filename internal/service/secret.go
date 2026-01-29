@@ -10,11 +10,10 @@ import (
 )
 
 type secretService struct {
-	repo   storage.Repository
-	encKey []byte
+	repo storage.Repository
 }
 
-func NewSecretService(repo storage.Repository, encKey []byte) SecretService {
+func NewSecretService(repo storage.Repository) SecretService {
 	return &secretService{
 		repo: repo,
 	}
