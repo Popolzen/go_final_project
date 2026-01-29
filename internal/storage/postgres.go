@@ -173,7 +173,7 @@ func (r *PostgresRepository) GetSecret(ctx context.Context, id, userID uuid.UUID
 
 	err := r.db.GetContext(ctx, &secret, query, id, userID)
 	if errors.Is(err, sql.ErrNoRows) {
-		return nil, models.ErrUserNotFound
+		return nil, models.ErrSecretNotFound
 	}
 	if err != nil {
 		return nil, fmt.Errorf("failed to get secret: %w", err)
@@ -189,7 +189,7 @@ func (r *PostgresRepository) GetSecretByName(ctx context.Context, name string, s
 
 	err := r.db.GetContext(ctx, &secret, query, name, secretType, userID)
 	if errors.Is(err, sql.ErrNoRows) {
-		return nil, models.ErrUserNotFound
+		return nil, models.ErrSecretNotFound
 	}
 	if err != nil {
 		return nil, fmt.Errorf("failed to get secret by name: %w", err)
