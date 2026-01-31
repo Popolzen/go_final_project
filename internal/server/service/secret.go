@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/Popolzen/go_final_project/internal/models"
-	"github.com/Popolzen/go_final_project/internal/storage"
+	"github.com/Popolzen/go_final_project/internal/server/storage"
 	"github.com/google/uuid"
 )
 

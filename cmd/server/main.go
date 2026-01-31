@@ -11,8 +11,8 @@ import (
 
 	config "github.com/Popolzen/go_final_project/configs"
 	"github.com/Popolzen/go_final_project/internal/server"
-	"github.com/Popolzen/go_final_project/internal/service"
-	"github.com/Popolzen/go_final_project/internal/storage"
+	"github.com/Popolzen/go_final_project/internal/server/service"
+	"github.com/Popolzen/go_final_project/internal/server/storage"
 )
 
 func main() {

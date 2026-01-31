@@ -36,7 +36,6 @@ func (s *Secret) IsDeleted() bool {
 	return s.DeletedAt != nil
 }
 
-// Структуры расшифрованных данных
 type LoginData struct {
 	Login    string `json:"login"`
 	Password string `json:"password"`

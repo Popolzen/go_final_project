@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/Popolzen/go_final_project/internal/service"
+	"github.com/Popolzen/go_final_project/internal/server/service"
 )
 
 // Handler содержит зависимости для всех handlers
