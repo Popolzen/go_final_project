@@ -16,7 +16,7 @@ var (
 	secretService service.SecretService
 )
 
-func NewRootCmd(tp string) *cobra.Command {
+func NewRootCmd(tp string, encKey []byte) *cobra.Command {
 	tokenPath = tp
 
 	cmd := &cobra.Command{
@@ -28,7 +28,7 @@ func NewRootCmd(tp string) *cobra.Command {
 
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 			authService = service.NewAuthService(serverAddr, tokenPath)
-			secretService = service.NewSecretService(serverAddr, tokenPath)
+			secretService = service.NewSecretService(serverAddr, tokenPath, encKey)
 			return nil
 		},
 	}

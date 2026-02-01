@@ -38,10 +38,10 @@ func newUpdateLoginCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "login <type> <n>",
 		Short: "Update login/password",
-		Args:  cobra.ExactArgs(2),
+		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			secretType := models.SecretType(args[0])
-			name := args[1]
+			secretType := models.SecretType("login")
+			name := args[0]
 
 			data, err := json.Marshal(models.LoginData{
 				Login:    login,
@@ -75,11 +75,11 @@ func newUpdateTextCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "text <type> <n> <content>",
 		Short: "Update text note",
-		Args:  cobra.ExactArgs(3),
+		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			secretType := models.SecretType(args[0])
-			name := args[1]
-			content := args[2]
+			secretType := models.SecretType("text")
+			name := args[0]
+			content := args[1]
 
 			data, err := json.Marshal(models.TextData{
 				Content: content,
@@ -111,10 +111,10 @@ func newUpdateBinaryCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "binary <type> <n>",
 		Short: "Update binary file",
-		Args:  cobra.ExactArgs(2),
+		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			secretType := models.SecretType(args[0])
-			name := args[1]
+			secretType := models.SecretType("binary")
+			name := args[0]
 
 			fileData, err := os.ReadFile(file)
 			if err != nil {
@@ -157,10 +157,10 @@ func newUpdateCardCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "card <type> <n>",
 		Short: "Update bank card",
-		Args:  cobra.ExactArgs(2),
+		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			secretType := models.SecretType(args[0])
-			name := args[1]
+			secretType := models.SecretType("card")
+			name := args[0]
 
 			data, err := json.Marshal(models.CardData{
 				Number: number,

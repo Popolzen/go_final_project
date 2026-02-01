@@ -14,12 +14,14 @@ import (
 type secretService struct {
 	serverAddr string
 	tokenPath  string
+	encKey     []byte
 }
 
-func NewSecretService(serverAddr, tokenPath string) SecretService {
+func NewSecretService(serverAddr, tokenPath string, encKey []byte) SecretService {
 	return &secretService{
 		serverAddr: serverAddr,
 		tokenPath:  tokenPath,
+		encKey:     encKey,
 	}
 }
 
@@ -41,10 +43,15 @@ func (s *secretService) Create(ctx context.Context, secretType models.SecretType
 		return nil, err
 	}
 
+	encrypted, err := s.encrypt(data)
+	if err != nil {
+		return nil, fmt.Errorf("encrypt data request: %w", err)
+	}
+
 	body, err := json.Marshal(createRequest{
 		Type:     secretType,
 		Name:     name,
-		Data:     data,
+		Data:     encrypted,
 		Metadata: metadata,
 	})
 	if err != nil {
@@ -145,7 +152,11 @@ func (s *secretService) GetByName(ctx context.Context, name string, secretType m
 	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
 		return nil, fmt.Errorf("decode response: %w", err)
 	}
-
+	decrypted, err := s.decrypt(result.Data)
+	if err != nil {
+		return nil, fmt.Errorf("failed to decrypt: %w", err)
+	}
+	result.Data = decrypted
 	return &result, nil
 }
 
@@ -160,8 +171,12 @@ func (s *secretService) Update(ctx context.Context, name string, secretType mode
 		return fmt.Errorf("get secret: %w", err)
 	}
 
+	encrypted, err := s.encrypt(data)
+	if err != nil {
+		return fmt.Errorf("encrypt data request: %w", err)
+	}
 	body, err := json.Marshal(updateRequest{
-		Data:     data,
+		Data:     encrypted,
 		Metadata: metadata,
 	})
 	if err != nil {
