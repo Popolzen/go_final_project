@@ -10,25 +10,25 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func newAddCmd() *cobra.Command {
+func newUpdateCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "add",
-		Short: "Добавить секрет",
+		Use:   "update",
+		Short: "Обновить секрет",
 		Args:  cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return cmd.Help()
 		},
 	}
 
-	cmd.AddCommand(newAddLoginCmd())
-	cmd.AddCommand(newAddTextCmd())
-	cmd.AddCommand(newAddBinaryCmd())
-	cmd.AddCommand(newAddCardCmd())
+	cmd.AddCommand(newUpdateLoginCmd())
+	cmd.AddCommand(newUpdateTextCmd())
+	cmd.AddCommand(newUpdateBinaryCmd())
+	cmd.AddCommand(newUpdateCardCmd())
 
 	return cmd
 }
 
-func newAddLoginCmd() *cobra.Command {
+func newUpdateLoginCmd() *cobra.Command {
 	var (
 		login    string
 		password string
@@ -36,11 +36,12 @@ func newAddLoginCmd() *cobra.Command {
 	)
 
 	cmd := &cobra.Command{
-		Use:   "login <n>",
-		Short: "Add login/pass",
-		Args:  cobra.ExactArgs(1),
+		Use:   "login <type> <n>",
+		Short: "Update login/password",
+		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			name := args[0]
+			secretType := models.SecretType(args[0])
+			name := args[1]
 
 			data, err := json.Marshal(models.LoginData{
 				Login:    login,
@@ -50,12 +51,11 @@ func newAddLoginCmd() *cobra.Command {
 				return fmt.Errorf("marshal data: %w", err)
 			}
 
-			result, err := secretService.Create(cmd.Context(), models.SecretTypeLogin, name, metadata, data)
-			if err != nil {
+			if err := secretService.Update(cmd.Context(), name, secretType, metadata, data); err != nil {
 				return err
 			}
 
-			fmt.Printf("создан: id=%s name=%s\n", result.ID, result.Name)
+			fmt.Println("обновлено")
 			return nil
 		},
 	}
@@ -69,16 +69,17 @@ func newAddLoginCmd() *cobra.Command {
 	return cmd
 }
 
-func newAddTextCmd() *cobra.Command {
+func newUpdateTextCmd() *cobra.Command {
 	var metadata string
 
 	cmd := &cobra.Command{
-		Use:   "text <name> <content>",
-		Short: "Add text note",
-		Args:  cobra.ExactArgs(2),
+		Use:   "text <type> <n> <content>",
+		Short: "Update text note",
+		Args:  cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			name := args[0]
-			content := args[1]
+			secretType := models.SecretType(args[0])
+			name := args[1]
+			content := args[2]
 
 			data, err := json.Marshal(models.TextData{
 				Content: content,
@@ -87,12 +88,11 @@ func newAddTextCmd() *cobra.Command {
 				return fmt.Errorf("marshal data: %w", err)
 			}
 
-			result, err := secretService.Create(cmd.Context(), models.SecretTypeText, name, metadata, data)
-			if err != nil {
+			if err := secretService.Update(cmd.Context(), name, secretType, metadata, data); err != nil {
 				return err
 			}
 
-			fmt.Printf("создан: id=%s name=%s\n", result.ID, result.Name)
+			fmt.Println("обновлено")
 			return nil
 		},
 	}
@@ -102,18 +102,19 @@ func newAddTextCmd() *cobra.Command {
 	return cmd
 }
 
-func newAddBinaryCmd() *cobra.Command {
+func newUpdateBinaryCmd() *cobra.Command {
 	var (
 		file     string
 		metadata string
 	)
 
 	cmd := &cobra.Command{
-		Use:   "binary <name>",
-		Short: "Add binary file",
-		Args:  cobra.ExactArgs(1),
+		Use:   "binary <type> <n>",
+		Short: "Update binary file",
+		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			name := args[0]
+			secretType := models.SecretType(args[0])
+			name := args[1]
 
 			fileData, err := os.ReadFile(file)
 			if err != nil {
@@ -128,12 +129,11 @@ func newAddBinaryCmd() *cobra.Command {
 				return fmt.Errorf("marshal data: %w", err)
 			}
 
-			result, err := secretService.Create(cmd.Context(), models.SecretTypeBinary, name, metadata, data)
-			if err != nil {
+			if err := secretService.Update(cmd.Context(), name, secretType, metadata, data); err != nil {
 				return err
 			}
 
-			fmt.Printf("создан: id=%s name=%s\n", result.ID, result.Name)
+			fmt.Println("обновлено")
 			return nil
 		},
 	}
@@ -145,7 +145,7 @@ func newAddBinaryCmd() *cobra.Command {
 	return cmd
 }
 
-func newAddCardCmd() *cobra.Command {
+func newUpdateCardCmd() *cobra.Command {
 	var (
 		number   string
 		holder   string
@@ -155,11 +155,12 @@ func newAddCardCmd() *cobra.Command {
 	)
 
 	cmd := &cobra.Command{
-		Use:   "card <name>",
-		Short: "Add bank card",
-		Args:  cobra.ExactArgs(1),
+		Use:   "card <type> <n>",
+		Short: "Update bank card",
+		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			name := args[0]
+			secretType := models.SecretType(args[0])
+			name := args[1]
 
 			data, err := json.Marshal(models.CardData{
 				Number: number,
@@ -171,12 +172,11 @@ func newAddCardCmd() *cobra.Command {
 				return fmt.Errorf("marshal data: %w", err)
 			}
 
-			result, err := secretService.Create(cmd.Context(), models.SecretTypeCard, name, metadata, data)
-			if err != nil {
+			if err := secretService.Update(cmd.Context(), name, secretType, metadata, data); err != nil {
 				return err
 			}
 
-			fmt.Printf("создан: id=%s name=%s\n", result.ID, result.Name)
+			fmt.Println("обновлено")
 			return nil
 		},
 	}

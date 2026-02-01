@@ -21,7 +21,7 @@ func NewRootCmd(tp string) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "gophkeeper",
-		Short: "Passowrd manager",
+		Short: "Password manager",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return cmd.Help()
 		},
@@ -38,6 +38,10 @@ func NewRootCmd(tp string) *cobra.Command {
 	cmd.AddCommand(newRegisterCmd())
 	cmd.AddCommand(newLoginCmd())
 	cmd.AddCommand(newAddCmd())
+	cmd.AddCommand(newListCmd())
+	cmd.AddCommand(newGetCmd())
+	cmd.AddCommand(newUpdateCmd())
+	cmd.AddCommand(newDeleteCmd())
 
 	return cmd
 }
