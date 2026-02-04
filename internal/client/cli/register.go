@@ -6,7 +6,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func newRegisterCmd() *cobra.Command {
+func (c *CLI) newRegisterCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "register <username> <password>",
 		Short: "Register new user",
@@ -15,7 +15,7 @@ func newRegisterCmd() *cobra.Command {
 			username := args[0]
 			password := args[1]
 
-			if err := authService.Register(cmd.Context(), username, password); err != nil {
+			if err := c.authService.Register(cmd.Context(), username, password); err != nil {
 				return fmt.Errorf("register: %w", err)
 			}
 

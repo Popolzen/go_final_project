@@ -6,7 +6,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func newLoginCmd() *cobra.Command {
+func (c *CLI) newLoginCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "login <username> <password>",
 		Short: "Enter existing account",
@@ -15,7 +15,7 @@ func newLoginCmd() *cobra.Command {
 			username := args[0]
 			password := args[1]
 
-			if err := authService.Login(cmd.Context(), username, password); err != nil {
+			if err := c.authService.Login(cmd.Context(), username, password); err != nil {
 				return fmt.Errorf("login: %w", err)
 			}
 

@@ -10,7 +10,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func newAddCmd() *cobra.Command {
+func (c *CLI) newAddCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "add",
 		Short: "Добавить секрет",
@@ -20,15 +20,15 @@ func newAddCmd() *cobra.Command {
 		},
 	}
 
-	cmd.AddCommand(newAddLoginCmd())
-	cmd.AddCommand(newAddTextCmd())
-	cmd.AddCommand(newAddBinaryCmd())
-	cmd.AddCommand(newAddCardCmd())
+	cmd.AddCommand(c.newAddLoginCmd())
+	cmd.AddCommand(c.newAddTextCmd())
+	cmd.AddCommand(c.newAddBinaryCmd())
+	cmd.AddCommand(c.newAddCardCmd())
 
 	return cmd
 }
 
-func newAddLoginCmd() *cobra.Command {
+func (c *CLI) newAddLoginCmd() *cobra.Command {
 	var (
 		login    string
 		password string
@@ -50,7 +50,7 @@ func newAddLoginCmd() *cobra.Command {
 				return fmt.Errorf("marshal data: %w", err)
 			}
 
-			result, err := secretService.Create(cmd.Context(), models.SecretTypeLogin, name, metadata, data)
+			result, err := c.secretService.Create(cmd.Context(), models.SecretTypeLogin, name, metadata, data)
 			if err != nil {
 				return err
 			}
@@ -69,7 +69,7 @@ func newAddLoginCmd() *cobra.Command {
 	return cmd
 }
 
-func newAddTextCmd() *cobra.Command {
+func (c *CLI) newAddTextCmd() *cobra.Command {
 	var metadata string
 
 	cmd := &cobra.Command{
@@ -87,7 +87,7 @@ func newAddTextCmd() *cobra.Command {
 				return fmt.Errorf("marshal data: %w", err)
 			}
 
-			result, err := secretService.Create(cmd.Context(), models.SecretTypeText, name, metadata, data)
+			result, err := c.secretService.Create(cmd.Context(), models.SecretTypeText, name, metadata, data)
 			if err != nil {
 				return err
 			}
@@ -102,7 +102,7 @@ func newAddTextCmd() *cobra.Command {
 	return cmd
 }
 
-func newAddBinaryCmd() *cobra.Command {
+func (c *CLI) newAddBinaryCmd() *cobra.Command {
 	var (
 		file     string
 		metadata string
@@ -128,7 +128,7 @@ func newAddBinaryCmd() *cobra.Command {
 				return fmt.Errorf("marshal data: %w", err)
 			}
 
-			result, err := secretService.Create(cmd.Context(), models.SecretTypeBinary, name, metadata, data)
+			result, err := c.secretService.Create(cmd.Context(), models.SecretTypeBinary, name, metadata, data)
 			if err != nil {
 				return err
 			}
@@ -145,7 +145,7 @@ func newAddBinaryCmd() *cobra.Command {
 	return cmd
 }
 
-func newAddCardCmd() *cobra.Command {
+func (c *CLI) newAddCardCmd() *cobra.Command {
 	var (
 		number   string
 		holder   string
@@ -171,7 +171,7 @@ func newAddCardCmd() *cobra.Command {
 				return fmt.Errorf("marshal data: %w", err)
 			}
 
-			result, err := secretService.Create(cmd.Context(), models.SecretTypeCard, name, metadata, data)
+			result, err := c.secretService.Create(cmd.Context(), models.SecretTypeCard, name, metadata, data)
 			if err != nil {
 				return err
 			}

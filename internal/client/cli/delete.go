@@ -7,7 +7,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func newDeleteCmd() *cobra.Command {
+func (c *CLI) newDeleteCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "delete <type> <n>",
 		Short: "Удалить секрет",
@@ -20,7 +20,7 @@ func newDeleteCmd() *cobra.Command {
 				return fmt.Errorf("invalid type: %s (login/text/binary/card)", args[0])
 			}
 
-			if err := secretService.Delete(cmd.Context(), name, secretType); err != nil {
+			if err := c.secretService.Delete(cmd.Context(), name, secretType); err != nil {
 				return err
 			}
 

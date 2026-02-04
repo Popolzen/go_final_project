@@ -6,13 +6,13 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func newListCmd() *cobra.Command {
+func (c *CLI) newListCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "list",
 		Short: "Список секретов",
 		Args:  cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			secrets, err := secretService.List(cmd.Context())
+			secrets, err := c.secretService.List(cmd.Context())
 			if err != nil {
 				return err
 			}

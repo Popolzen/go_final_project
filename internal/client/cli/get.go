@@ -9,7 +9,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func newGetCmd() *cobra.Command {
+func (c *CLI) newGetCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "get <type> <n>",
 		Short: "Получить секрет",
@@ -22,7 +22,7 @@ func newGetCmd() *cobra.Command {
 				return fmt.Errorf("invalid type: %s (login/text/binary/card)", args[0])
 			}
 
-			secret, err := secretService.GetByName(cmd.Context(), name, secretType)
+			secret, err := c.secretService.GetByName(cmd.Context(), name, secretType)
 			if err != nil {
 				return err
 			}

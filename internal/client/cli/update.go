@@ -10,7 +10,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func newUpdateCmd() *cobra.Command {
+func (c *CLI) newUpdateCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "update",
 		Short: "Обновить секрет",
@@ -20,15 +20,15 @@ func newUpdateCmd() *cobra.Command {
 		},
 	}
 
-	cmd.AddCommand(newUpdateLoginCmd())
-	cmd.AddCommand(newUpdateTextCmd())
-	cmd.AddCommand(newUpdateBinaryCmd())
-	cmd.AddCommand(newUpdateCardCmd())
+	cmd.AddCommand(c.newUpdateLoginCmd())
+	cmd.AddCommand(c.newUpdateTextCmd())
+	cmd.AddCommand(c.newUpdateBinaryCmd())
+	cmd.AddCommand(c.newUpdateCardCmd())
 
 	return cmd
 }
 
-func newUpdateLoginCmd() *cobra.Command {
+func (c *CLI) newUpdateLoginCmd() *cobra.Command {
 	var (
 		login    string
 		password string
@@ -36,7 +36,7 @@ func newUpdateLoginCmd() *cobra.Command {
 	)
 
 	cmd := &cobra.Command{
-		Use:   "login <type> <n>",
+		Use:   "login <n>",
 		Short: "Update login/password",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -51,7 +51,7 @@ func newUpdateLoginCmd() *cobra.Command {
 				return fmt.Errorf("marshal data: %w", err)
 			}
 
-			if err := secretService.Update(cmd.Context(), name, secretType, metadata, data); err != nil {
+			if err := c.secretService.Update(cmd.Context(), name, secretType, metadata, data); err != nil {
 				return err
 			}
 
@@ -69,11 +69,11 @@ func newUpdateLoginCmd() *cobra.Command {
 	return cmd
 }
 
-func newUpdateTextCmd() *cobra.Command {
+func (c *CLI) newUpdateTextCmd() *cobra.Command {
 	var metadata string
 
 	cmd := &cobra.Command{
-		Use:   "text <type> <n> <content>",
+		Use:   "text <n> <content>",
 		Short: "Update text note",
 		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -88,7 +88,7 @@ func newUpdateTextCmd() *cobra.Command {
 				return fmt.Errorf("marshal data: %w", err)
 			}
 
-			if err := secretService.Update(cmd.Context(), name, secretType, metadata, data); err != nil {
+			if err := c.secretService.Update(cmd.Context(), name, secretType, metadata, data); err != nil {
 				return err
 			}
 
@@ -102,14 +102,14 @@ func newUpdateTextCmd() *cobra.Command {
 	return cmd
 }
 
-func newUpdateBinaryCmd() *cobra.Command {
+func (c *CLI) newUpdateBinaryCmd() *cobra.Command {
 	var (
 		file     string
 		metadata string
 	)
 
 	cmd := &cobra.Command{
-		Use:   "binary <type> <n>",
+		Use:   "binary <n>",
 		Short: "Update binary file",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -129,7 +129,7 @@ func newUpdateBinaryCmd() *cobra.Command {
 				return fmt.Errorf("marshal data: %w", err)
 			}
 
-			if err := secretService.Update(cmd.Context(), name, secretType, metadata, data); err != nil {
+			if err := c.secretService.Update(cmd.Context(), name, secretType, metadata, data); err != nil {
 				return err
 			}
 
@@ -145,7 +145,7 @@ func newUpdateBinaryCmd() *cobra.Command {
 	return cmd
 }
 
-func newUpdateCardCmd() *cobra.Command {
+func (c *CLI) newUpdateCardCmd() *cobra.Command {
 	var (
 		number   string
 		holder   string
@@ -155,7 +155,7 @@ func newUpdateCardCmd() *cobra.Command {
 	)
 
 	cmd := &cobra.Command{
-		Use:   "card <type> <n>",
+		Use:   "card <n>",
 		Short: "Update bank card",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -172,7 +172,7 @@ func newUpdateCardCmd() *cobra.Command {
 				return fmt.Errorf("marshal data: %w", err)
 			}
 
-			if err := secretService.Update(cmd.Context(), name, secretType, metadata, data); err != nil {
+			if err := c.secretService.Update(cmd.Context(), name, secretType, metadata, data); err != nil {
 				return err
 			}
 

@@ -10,20 +10,23 @@ import (
 )
 
 func main() {
-	tokenPath := filepath.Join(configDir(), "token")
 	cfg, err := config.New()
 	if err != nil {
 		log.Fatalf("failed to load config: %v", err)
 	}
 
-	cmd := cli.NewRootCmd(tokenPath, []byte(cfg.EncryptKey))
+	tokenPath := filepath.Join(configDir(), "token")
+
+	cliApp := cli.NewCLI(tokenPath, []byte(cfg.EncryptKey))
+	cmd := cliApp.NewRootCmd()
+
 	cli.Execute(cmd)
 }
 
 func configDir() string {
 	home, err := os.UserHomeDir()
 	if err != nil {
-		home = "."
+		return "."
 	}
 	return filepath.Join(home, ".config", "gophkeeper")
 }

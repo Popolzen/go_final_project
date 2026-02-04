@@ -9,16 +9,23 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var (
-	serverAddr    string
-	tokenPath     string
+type CLI struct {
+	serverAddr string
+	tokenPath  string
+	encKey     []byte
+
 	authService   service.AuthService
 	secretService service.SecretService
-)
+}
 
-func NewRootCmd(tp string, encKey []byte) *cobra.Command {
-	tokenPath = tp
+func NewCLI(tokenPath string, encKey []byte) *CLI {
+	return &CLI{
+		tokenPath: tokenPath,
+		encKey:    encKey,
+	}
+}
 
+func (c *CLI) NewRootCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "gophkeeper",
 		Short: "Password manager",
@@ -27,21 +34,22 @@ func NewRootCmd(tp string, encKey []byte) *cobra.Command {
 		},
 
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
-			authService = service.NewAuthService(serverAddr, tokenPath)
-			secretService = service.NewSecretService(serverAddr, tokenPath, encKey)
+			c.authService = service.NewAuthService(c.serverAddr, c.tokenPath)
+			c.secretService = service.NewSecretService(c.serverAddr, c.tokenPath, c.encKey)
 			return nil
 		},
 	}
 
-	cmd.PersistentFlags().StringVar(&serverAddr, "server", "http://localhost:8080", "адрес сервера")
+	cmd.PersistentFlags().
+		StringVar(&c.serverAddr, "server", "http://localhost:8080", "адрес сервера")
 
-	cmd.AddCommand(newRegisterCmd())
-	cmd.AddCommand(newLoginCmd())
-	cmd.AddCommand(newAddCmd())
-	cmd.AddCommand(newListCmd())
-	cmd.AddCommand(newGetCmd())
-	cmd.AddCommand(newUpdateCmd())
-	cmd.AddCommand(newDeleteCmd())
+	cmd.AddCommand(c.newRegisterCmd())
+	cmd.AddCommand(c.newLoginCmd())
+	cmd.AddCommand(c.newAddCmd())
+	cmd.AddCommand(c.newListCmd())
+	cmd.AddCommand(c.newGetCmd())
+	cmd.AddCommand(c.newUpdateCmd())
+	cmd.AddCommand(c.newDeleteCmd())
 
 	return cmd
 }
