@@ -19,7 +19,7 @@ func (c *CLI) newLoginCmd() *cobra.Command {
 				return fmt.Errorf("login: %w", err)
 			}
 
-			fmt.Println("login succses")
+			fmt.Println("login success")
 			return nil
 		},
 	}

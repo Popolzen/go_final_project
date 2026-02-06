@@ -19,7 +19,7 @@ func (c *CLI) newRegisterCmd() *cobra.Command {
 				return fmt.Errorf("register: %w", err)
 			}
 
-			fmt.Println("register succses")
+			fmt.Println("register success")
 			return nil
 		},
 	}

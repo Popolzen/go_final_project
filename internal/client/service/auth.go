@@ -13,12 +13,18 @@ import (
 type authService struct {
 	serverAddr string
 	tokenPath  string
+	httpClient *http.Client
 }
 
-func NewAuthService(serverAddr, tokenPath string) AuthService {
+func NewAuthService(
+	serverAddr string,
+	tokenPath string,
+	httpClient *http.Client,
+) AuthService {
 	return &authService{
 		serverAddr: serverAddr,
 		tokenPath:  tokenPath,
+		httpClient: httpClient,
 	}
 }
 
@@ -67,9 +73,10 @@ func (s *authService) callAuth(ctx context.Context, path, username, password str
 	if err != nil {
 		return "", fmt.Errorf("create request: %w", err)
 	}
+
 	req.Header.Set("Content-Type", "application/json")
 
-	resp, err := http.DefaultClient.Do(req)
+	resp, err := s.httpClient.Do(req)
 	if err != nil {
 		return "", fmt.Errorf("request to server: %w", err)
 	}

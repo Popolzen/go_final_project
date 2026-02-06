@@ -2,8 +2,10 @@ package main
 
 import (
 	"log"
+	"net/http"
 	"os"
 	"path/filepath"
+	"time"
 
 	config "github.com/Popolzen/go_final_project/configs"
 	"github.com/Popolzen/go_final_project/internal/client/cli"
@@ -17,9 +19,17 @@ func main() {
 
 	tokenPath := filepath.Join(configDir(), "token")
 
-	cliApp := cli.NewCLI(tokenPath, []byte(cfg.EncryptKey))
-	cmd := cliApp.NewRootCmd()
+	httpClient := &http.Client{
+		Timeout: 10 * time.Second,
+	}
 
+	cliApp := cli.NewCLI(
+		tokenPath,
+		[]byte(cfg.EncryptKey),
+		httpClient,
+	)
+
+	cmd := cliApp.NewRootCmd()
 	cli.Execute(cmd)
 }
 

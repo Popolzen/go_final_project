@@ -15,13 +15,15 @@ type secretService struct {
 	serverAddr string
 	tokenPath  string
 	encKey     []byte
+	httpClient *http.Client
 }
 
-func NewSecretService(serverAddr, tokenPath string, encKey []byte) SecretService {
+func NewSecretService(serverAddr string, tokenPath string, encKey []byte, httpClient *http.Client) SecretService {
 	return &secretService{
 		serverAddr: serverAddr,
 		tokenPath:  tokenPath,
 		encKey:     encKey,
+		httpClient: httpClient,
 	}
 }
 
@@ -62,10 +64,11 @@ func (s *secretService) Create(ctx context.Context, secretType models.SecretType
 	if err != nil {
 		return nil, fmt.Errorf("create request: %w", err)
 	}
+
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", "Bearer "+token)
 
-	resp, err := http.DefaultClient.Do(req)
+	resp, err := s.httpClient.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("request to server: %w", err)
 	}
@@ -99,7 +102,7 @@ func (s *secretService) List(ctx context.Context) ([]*SecretInfo, error) {
 	}
 	req.Header.Set("Authorization", "Bearer "+token)
 
-	resp, err := http.DefaultClient.Do(req)
+	resp, err := s.httpClient.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("request to server: %w", err)
 	}
@@ -134,7 +137,7 @@ func (s *secretService) GetByName(ctx context.Context, name string, secretType m
 	}
 	req.Header.Set("Authorization", "Bearer "+token)
 
-	resp, err := http.DefaultClient.Do(req)
+	resp, err := s.httpClient.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("request to server: %w", err)
 	}
@@ -191,7 +194,7 @@ func (s *secretService) Update(ctx context.Context, name string, secretType mode
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", "Bearer "+token)
 
-	resp, err := http.DefaultClient.Do(req)
+	resp, err := s.httpClient.Do(req)
 	if err != nil {
 		return fmt.Errorf("request to server: %w", err)
 	}
@@ -224,9 +227,10 @@ func (s *secretService) Delete(ctx context.Context, name string, secretType mode
 	if err != nil {
 		return fmt.Errorf("create request: %w", err)
 	}
+
 	req.Header.Set("Authorization", "Bearer "+token)
 
-	resp, err := http.DefaultClient.Do(req)
+	resp, err := s.httpClient.Do(req)
 	if err != nil {
 		return fmt.Errorf("request to server: %w", err)
 	}
