@@ -2,8 +2,6 @@ package cli
 
 import (
 	"encoding/base64"
-	"encoding/json"
-	"fmt"
 	"os"
 
 	"github.com/Popolzen/go_final_project/internal/models"
@@ -36,27 +34,20 @@ func (c *CLI) newUpdateLoginCmd() *cobra.Command {
 	)
 
 	cmd := &cobra.Command{
-		Use:   "login <n>",
+		Use:   "login <name>",
 		Short: "Update login/password",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			secretType := models.SecretType("login")
-			name := args[0]
-
-			data, err := json.Marshal(models.LoginData{
-				Login:    login,
-				Password: password,
-			})
-			if err != nil {
-				return fmt.Errorf("marshal data: %w", err)
-			}
-
-			if err := c.secretService.Update(cmd.Context(), name, secretType, metadata, data); err != nil {
-				return err
-			}
-
-			fmt.Println("обновлено")
-			return nil
+			return c.updateSecret(
+				cmd.Context(),
+				models.SecretTypeLogin,
+				args[0],
+				metadata,
+				models.LoginData{
+					Login:    login,
+					Password: password,
+				},
+			)
 		},
 	}
 
@@ -73,27 +64,19 @@ func (c *CLI) newUpdateTextCmd() *cobra.Command {
 	var metadata string
 
 	cmd := &cobra.Command{
-		Use:   "text <n> <content>",
+		Use:   "text <name> <content>",
 		Short: "Update text note",
 		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			secretType := models.SecretType("text")
-			name := args[0]
-			content := args[1]
-
-			data, err := json.Marshal(models.TextData{
-				Content: content,
-			})
-			if err != nil {
-				return fmt.Errorf("marshal data: %w", err)
-			}
-
-			if err := c.secretService.Update(cmd.Context(), name, secretType, metadata, data); err != nil {
-				return err
-			}
-
-			fmt.Println("обновлено")
-			return nil
+			return c.updateSecret(
+				cmd.Context(),
+				models.SecretTypeText,
+				args[0],
+				metadata,
+				models.TextData{
+					Content: args[1],
+				},
+			)
 		},
 	}
 
@@ -109,32 +92,25 @@ func (c *CLI) newUpdateBinaryCmd() *cobra.Command {
 	)
 
 	cmd := &cobra.Command{
-		Use:   "binary <n>",
+		Use:   "binary <name>",
 		Short: "Update binary file",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			secretType := models.SecretType("binary")
-			name := args[0]
-
 			fileData, err := os.ReadFile(file)
 			if err != nil {
-				return fmt.Errorf("read file: %w", err)
-			}
-
-			data, err := json.Marshal(models.BinaryData{
-				Filename: file,
-				Content:  base64.StdEncoding.EncodeToString(fileData),
-			})
-			if err != nil {
-				return fmt.Errorf("marshal data: %w", err)
-			}
-
-			if err := c.secretService.Update(cmd.Context(), name, secretType, metadata, data); err != nil {
 				return err
 			}
 
-			fmt.Println("обновлено")
-			return nil
+			return c.updateSecret(
+				cmd.Context(),
+				models.SecretTypeBinary,
+				args[0],
+				metadata,
+				models.BinaryData{
+					Filename: file,
+					Content:  base64.StdEncoding.EncodeToString(fileData),
+				},
+			)
 		},
 	}
 
@@ -155,29 +131,22 @@ func (c *CLI) newUpdateCardCmd() *cobra.Command {
 	)
 
 	cmd := &cobra.Command{
-		Use:   "card <n>",
+		Use:   "card <name>",
 		Short: "Update bank card",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			secretType := models.SecretType("card")
-			name := args[0]
-
-			data, err := json.Marshal(models.CardData{
-				Number: number,
-				Holder: holder,
-				CVV:    cvv,
-				Expiry: expiry,
-			})
-			if err != nil {
-				return fmt.Errorf("marshal data: %w", err)
-			}
-
-			if err := c.secretService.Update(cmd.Context(), name, secretType, metadata, data); err != nil {
-				return err
-			}
-
-			fmt.Println("обновлено")
-			return nil
+			return c.updateSecret(
+				cmd.Context(),
+				models.SecretTypeCard,
+				args[0],
+				metadata,
+				models.CardData{
+					Number: number,
+					Holder: holder,
+					CVV:    cvv,
+					Expiry: expiry,
+				},
+			)
 		},
 	}
 
