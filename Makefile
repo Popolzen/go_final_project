@@ -9,8 +9,6 @@ help:
 	@echo "  make run-server      - Run server"
 	@echo "  make migrate-up      - Apply migrations"
 	@echo "  make migrate-down    - Rollback migrations"
-	@echo "  make docker-up       - Start PostgreSQL"
-	@echo "  make docker-down     - Stop PostgreSQL"
 	@echo "  make test            - Run tests"
 	@echo "  make clean           - Clean binaries"
 
@@ -29,16 +27,6 @@ migrate-up:
 migrate-down:
 	migrate -path ./migrations/migrations -database "$(DB_DSN)" down
 
-docker-up:
-	docker run -d --name gophkeeper-postgres \
-		-e POSTGRES_PASSWORD=123456 \
-		-e POSTGRES_DB=gophkeeper \
-		-p 5432:5432 \
-		postgres:15
-
-docker-down:
-	docker stop gophkeeper-postgres
-	docker rm gophkeeper-postgres
 
 test:
 	go test -v -cover ./...
